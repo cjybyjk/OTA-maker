@@ -222,7 +222,10 @@ def get_selabel_windows(dic, path, t_root=''):
     for reg in dic.keys():
         tmp_matched = re.match(reg, path)
         if not tmp_matched: tmp_matched = re.match(t_root + reg, path)
-        mat_length = tmp_matched.span()[1]
+        if tmp_matched:
+            mat_length = tmp_matched.span()[1]
+        else:
+            continue
         if mat_length > old_length:
             k = dic[reg]
             old_length = mat_length

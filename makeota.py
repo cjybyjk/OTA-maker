@@ -253,15 +253,29 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                     tmp_updater.package_extract_file(tmp_line[1], tmp_line[2])
                 elif us_action == "ui_print":
                     tmp_updater.ui_print(" ".join(str(s) for s in tmp_line[1:]))
-                    continue
                 elif us_action == "set_perm":
                     tmp_updater.set_perm(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4:])
                 elif us_action == "set_perm_recursive":
-                    tmp_updater.set_perm_recursive(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4], tmp_line[5:])
+                    tmp_updater.set_perm_recursive(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4], tutle(tmp_line[5:]))
                 elif us_action == "set_metadata":
                     tmp_updater.set_metadata(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7])
                 elif us_action == "set_metadata_recursive":
                     tmp_updater.set_metadata_recursive(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7], tmp_line[9])
+                elif us_action == "mount":
+                    tmp_updater.mount(tmp_line[-1])
+                elif us_action == "umount":
+                    tmp_updater.umount(tmp_line[1])
+                elif us_action == "apply_patch_check":
+                    tmp_updater.apply_patch_check(tmp_line[1], tutle(tmp_line[2:]))
+                elif us_action == "apply_patch":
+                    tmp_updater.add("apply_patch %s:%s;" 
+                                    %(" ".join(str(s) for s in tmp_line[1:5]), tmp_line[6]))
+                elif us_action == "show_progress":
+                    tmp_updater.add("show_progress %s %s;" %(tmp_line[1], tmp_line[6]))
+                elif us_action == "set_progress":
+                    tmp_updater.add("set_progress %s;" %tmp_line[1])
+                else:
+                    print("WARNING: failed to analyze " + line.strip())
             except:
                 continue
 

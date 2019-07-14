@@ -245,7 +245,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                     file2file(NEW_ZIP_PATH  + '/' + tmp_line[1], OTA_ZIP_PATH  + '/' + tmp_line[1])
                 elif us_action == "block_image_update": continue
                 elif us_action == "abort": continue
-                elif us_action == "format": 
+                elif us_action == "format" or us_action == "mount" or us_action == "unmount" : 
                     if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
             except:
                 pass

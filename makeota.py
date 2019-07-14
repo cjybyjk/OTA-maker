@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -166,7 +166,6 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
 
     print('Generating updater...')
     tmp_updater = Updater()
-    mkdir(OTA_ZIP_PATH + '/install')
     if '64' in build_prop_dict.get('ro.product.cpu.abi'):
         file2file(get_bin('update-binary_64'), OTA_ZIP_PATH + '/META-INF/com/google/android/update-binary')
     else:
@@ -192,7 +191,6 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     tmp_updater.blank_line()
     tmp_updater.ui_print('Extracting patch files...')
     tmp_updater.package_extract_dir('patch', '/tmp/patch')
-    tmp_updater.blank_line()
     tmp_updater.ui_print('Patching files...')
     for tmp_item in patch_list:
         ota_patch_path = OTA_ZIP_PATH + '/patch' + tmp_item.rela_path + '.p'
@@ -254,10 +252,10 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
             tmp_updater.add(line)
 
     tmp_updater.blank_line()
-    tmp_updater.add('Unmounting' + SYSTEM_ROOT)
+    tmp_updater.ui_print('Unmounting ' + SYSTEM_ROOT)
     tmp_updater.unmount(SYSTEM_ROOT)
     if IS_TREBLE:
-        tmp_updater.add('Unmounting /vendor...')
+        tmp_updater.ui_print('Unmounting /vendor...')
         tmp_updater.unmount("/vendor")
     tmp_updater.blank_line()
     tmp_updater.delete_recursive("/cache/*")

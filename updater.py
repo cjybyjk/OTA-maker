@@ -15,20 +15,19 @@ class Updater:
         # 添加时间戳校验，防止新版ROM刷入旧版OTA更新
         self.script.append(
             '(!less_than_int(%s, getprop("ro.build.date.utc"))) || ' 
-            'abort "Can\'t install this package (%s) over newer '
-            'build (getprop("ro.build.date"))."' %(int(time.time()), time_str))
+            'abort("Can\'t install this package (%s) over newer build '
+            '(" + getprop("ro.build.date") +").");' %(int(time.time()), time_str))
         self.blank_line()
 
-    def check_device(self, model, ext_models):
+    def check_device(self, model, ext_model=''):
         s = 'getprop("ro.product.device") == "%s" || ' % model
         s += 'getprop("ro.build.prduct") == "%s" || ' % model
-        for ext_m in ext_models:
-            if ext_m != model:
-                s += 'getprop("ro.product.device") == "%s" || ' % ext_m
-                s += 'getprop("ro.build.prduct") == "%s" || ' % ext_m
-        s += ('abort("This package is for \"%s\"; '
-              % ",".join([str(m) for m in (model, *ext_models)]))
-        s += ' this is a \"" + getprop("ro.product.device") + "\".");\n'
+        if ext_model and not ext_model == model:
+            s += 'getprop("ro.product.device") == "%s" || ' %ext_model
+            s += 'getprop("ro.build.prduct") == "%s" || ' %ext_model
+        s += 'abort("This package is for \\"%s' %model
+        if ext_model and not ext_model == model: s+= ', %s' %ext_model
+        s += '\\"; this is a \\"" + getprop("ro.product.device") + "\\".");\n'
         self.script.append(s)
 
     def add(self, string, end="\n"):
@@ -44,7 +43,7 @@ class Updater:
         self.script.append(' ' * space_no + 'ui_print("%s");\n' % string)
 
     def mount(self, path):
-        self.script.append('mount("%s");\n' % path)
+        self.script.append('run_program("mount", "%s");\n' % path)
 
     def unmount(self, path):
         self.script.append('unmount("%s");\n' % path)
@@ -62,7 +61,7 @@ class Updater:
         self.script.append('delete_recursive("%s");\n' % ' '.join(dirs))
 
     def symlink(self, path, *links):
-        self.script.append('symlink("%s", "%s";\n' % (path, " ".join(links)))
+        self.script.append('symlink("%s", "%s");\n' % (path, " ".join(links)))
 
     def set_perm(self, owner, group, mode, *files):
         self.script.append('set_perm(%s, %s, %s, "%s");\n'
@@ -92,11 +91,12 @@ class Updater:
         self.script.append(s + ");\n")
 
     def apply_patch_check(self, spath, *f_shas):
-        self.script.append('apply_patch_check("%s", "%s");' % (spath, " ".join(f_shas)))
+        self.script.append('apply_patch_check("%s", "%s") || '
+                           'abort("%s has unexpected contents.");\n' % (spath, " ".join(f_shas), spath))
 
     def apply_patch(self, spath, f_sha1, tgtsize, p_sha1, p_path):
         # applypatch <目标文件路径> <-> <打补丁后的文件哈希> \
         #            <打补丁后的文件大小> <原文件哈希:补丁文件路径>
         # 其中 - 参数暗示覆盖原文件
-        self.script.append('apply_patch("%s", "-", "%s", "%s", "%s:%s");\n'
-                           % (spath, f_sha1, tgtsize, p_sha1, p_path))
+        self.script.append('apply_patch("%s", "%s", "%s", %d, "%s", "%s");\n'
+                           % (spath, spath, f_sha1, tgtsize, p_sha1, p_path))

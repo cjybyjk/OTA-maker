@@ -29,4 +29,5 @@ This tool can automatically generate OTA incremental upgrade package.
     - **bin/sefcontext_decompile**: https://github.com/wuxianlin/sefcontext_decompile
     - **bin/brotli**: https://github.com/google/brotli
     - **bin/imgextractor.exe**: https://4pda.ru/forum/index.php?showtopic=496786
-    - **bin/update-binary, bin/update-binary_64**: https://github.com/LineageOS/android_bootable_recovery/tree/lineage-15.1/updater
+    - **bin/update-binary**: https://forum.xda-developers.com/android/software-hacking/dev-complete-shell-script-flashable-zip-t2934449
+    - **bin/applypatch, bin/applypatch_64**: https://github.com/MoKee/android_bootable_recovery/tree/mkn/applypatch

@@ -192,7 +192,8 @@ def get_file_contexts(file_path, t_root=''):
             k, v = linesp.split(maxsplit=1)
             if v.startswith("--"):
                 v = v.split(maxsplit=1)[-1].strip()
-            sel_dic[ k] = v
+            sel_dic[re.compile(k)] = v
+            if t_root: sel_dic[re.compile(t_root + k)] = v
     return sel_dic
 
 
@@ -214,21 +215,18 @@ def get_selabel_linux(path):
     else:
         return info[0]
 
-def get_selabel_windows(dic, path, t_root=''):
+def get_selabel_windows(dic, key_set, path):
     # 通过检索get_file_contexts函数返回的dic
     # 获取path的SE上下文属性 返回最符合的结果
     k = ""
     old_length = 0
-    for reg in dic.keys():
-        tmp_matched = re.match(reg, path)
-        if not tmp_matched: tmp_matched = re.match(t_root + reg, path)
+    for reg in key_set:
+        tmp_matched = reg.match(path)
         if tmp_matched:
             mat_length = tmp_matched.span()[1]
-        else:
-            continue
-        if mat_length > old_length:
-            k = dic[reg]
-            old_length = mat_length
+            if mat_length > old_length:
+                k = dic[reg]
+                old_length = mat_length
     if not k:
         print("WARNING: Couldn't find %s's selabel" %path)
     return k

@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -121,6 +121,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
         else:
             if tmp_item.slink:
                 sym_set.add(tmp_item)
+                rem_set.add(tmp_item)
             elif not os.path.exists(OLD_ZIP_PATH + tmp_item.rela_path):
                 new_file_path = OTA_ZIP_PATH + tmp_item.rela_path
                 if not os.path.isdir(NEW_ZIP_PATH + tmp_item.rela_path):
@@ -148,9 +149,9 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
         else:
             tmp_root = ''
         if os.path.exists(NEW_ZIP_PATH + SYSTEM_ROOT + '/etc/selinux/plat_file_contexts'):
-            tmp_file_context = get_file_contexts(NEW_ZIP_PATH + SYSTEM_ROOT + '/etc/selinux/plat_file_contexts')
+            tmp_file_context = get_file_contexts(NEW_ZIP_PATH + SYSTEM_ROOT + '/etc/selinux/plat_file_contexts', tmp_root)
         elif os.path.exists(NEW_ZIP_PATH + SYSTEM_ROOT + '/system/etc/selinux/plat_file_contexts'):
-            tmp_file_context = get_file_contexts(NEW_ZIP_PATH + SYSTEM_ROOT + '/system/etc/selinux/plat_file_contexts')
+            tmp_file_context = get_file_contexts(NEW_ZIP_PATH + SYSTEM_ROOT + '/system/etc/selinux/plat_file_contexts', tmp_root)
         else:
             boot_out = extract_bootimg(NEW_ZIP_PATH + '/boot.img')
             if os.path.exists(boot_out + '/file_contexts'):
@@ -163,8 +164,9 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
             tmp_file_context.update(get_file_contexts(NEW_ZIP_PATH + '/vendor/etc/selinux/vendor_file_contexts'))
         if os.path.exists(NEW_ZIP_PATH + '/vendor/etc/selinux/nonplat_file_contexts'):
             tmp_file_context.update(get_file_contexts(NEW_ZIP_PATH + '/vendor/etc/selinux/nonplat_file_contexts'))
+        tmp_keys = tmp_file_context.keys()
         for tmp_item in new_set:
-            tmp_item.selabel = get_selabel_windows(tmp_file_context, tmp_item.rela_path, tmp_root)
+            tmp_item.selabel = get_selabel_windows(tmp_file_context, tmp_keys, tmp_item.rela_path)
 
     print('Generating updater...')
     tmp_updater = Updater()

@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -166,10 +166,13 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
 
     print('Generating updater...')
     tmp_updater = Updater()
+    mkdir(OTA_ZIP_PATH + '/install')
     if '64' in build_prop_dict.get('ro.product.cpu.abi'):
-        file2file(get_bin('update-binary_64'), OTA_ZIP_PATH + '/META-INF/com/google/android/update-binary')
+        tmp_updater.add("SYS_LD_LIBRARY_PATH=/system/lib64")
+        file2file(get_bin('applypatch_64'), OTA_ZIP_PATH + '/install/applypatch')
     else:
-        file2file(get_bin('applypatch'), OTA_ZIP_PATH + '/META-INF/com/google/android/update-binary')
+        tmp_updater.add("SYS_LD_LIBRARY_PATH=/system/lib")
+        file2file(get_bin('applypatch'), OTA_ZIP_PATH + '/install/applypatch')
     tmp_updater.check_device(
         build_prop_dict.get('ro.product.device'),
         build_prop_dict.get('ro.build.product'))
@@ -230,6 +233,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     tmp_updater.blank_line()
 
     # 从原版的updater-script取得操作
+    tmp_updater.add('ALLOW_ABORT = false')
     tmp_updater.ui_print('Running updater-script from source zip...')
     with open(NEW_ZIP_PATH + '/META-INF/com/google/android/updater-script', "r", encoding="UTF-8") as f:
         for line in f.readlines():
@@ -237,20 +241,30 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                 tmp_line = parameter_split(line.strip())
                 us_action = tmp_line[0]
                 if us_action == "package_extract_dir":
-                    if tmp_line[2] == "/system" or tmp_line[2] == "/vendor": continue
+                    if tmp_line[1] == "system" or tmp_line[1] == "vendor": continue
                     mkdir(os.path.dirname(OTA_ZIP_PATH + '/' + tmp_line[1]))
                     dir2dir(NEW_ZIP_PATH + '/' + tmp_line[1], OTA_ZIP_PATH + '/' + tmp_line[1])
+                    tmp_updater.package_extract_dir(tmp_line[1], tmp_line[2])
                 elif us_action == "package_extract_file":
                     mkdir(os.path.dirname(OTA_ZIP_PATH + '/' + tmp_line[1]))
                     file2file(NEW_ZIP_PATH  + '/' + tmp_line[1], OTA_ZIP_PATH  + '/' + tmp_line[1])
-                elif us_action == "block_image_update": continue
-                elif us_action == "abort": continue
-                elif us_action == "format" or us_action == "mount" or us_action == "unmount" : 
-                    if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
+                    tmp_updater.package_extract_file(tmp_line[1], tmp_line[2])
+                elif us_action == "ui_print":
+                    tmp_updater.ui_print(" ".join(str(s) for s in tmp_line[1:]))
+                    continue
+                elif us_action == "set_perm":
+                    tmp_updater.set_perm(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4:])
+                elif us_action == "set_perm_recursive":
+                    tmp_updater.set_perm_recursive(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4], tmp_line[5:])
+                elif us_action == "set_metadata":
+                    tmp_updater.set_metadata(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7])
+                elif us_action == "set_metadata_recursive":
+                    tmp_updater.set_metadata_recursive(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7], tmp_line[9])
             except:
-                pass
-            tmp_updater.add(line)
+                continue
 
+    tmp_updater.blank_line()
+    tmp_updater.add("sync")
     tmp_updater.blank_line()
     tmp_updater.ui_print('Unmounting ' + SYSTEM_ROOT)
     tmp_updater.unmount(SYSTEM_ROOT)
@@ -265,10 +279,13 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
 
     update_script_path = os.path.join(OTA_ZIP_PATH, "META-INF", "com", "google", "android")
     mkdir(update_script_path)
-    new_uc = os.path.join(update_script_path, "updater-script")
-    with open(new_uc, "w", encoding="UTF-8", newline="\n") as f:
+    new_ub = os.path.join(update_script_path, "update-binary")
+    with open(new_ub, "w", encoding="UTF-8", newline="\n") as f:
         for line in tmp_updater.script:
             f.write(line)
+    new_uc = os.path.join(update_script_path, "updater-script")
+    with open(new_uc, "w", encoding="UTF-8", newline="\n") as f:
+        f.write("# Dummy file; update-binary is a shell script.\n")
 
     print('Making OTA package...')
     make_zip(OTA_ZIP_PATH, OUT_PATH)

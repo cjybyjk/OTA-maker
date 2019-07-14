@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -160,7 +160,9 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
             else:
                 tmp_file_context = {}
         if os.path.exists(NEW_ZIP_PATH + '/vendor/etc/selinux/vendor_file_contexts'):
-            tmp_file_context = dict(tmp_file_context, **get_file_contexts(NEW_ZIP_PATH + '/vendor/etc/selinux/vendor_file_contexts'))
+            tmp_file_context.update(get_file_contexts(NEW_ZIP_PATH + '/vendor/etc/selinux/vendor_file_contexts'))
+        if os.path.exists(NEW_ZIP_PATH + '/vendor/etc/selinux/nonplat_file_contexts'):
+            tmp_file_context.update(get_file_contexts(NEW_ZIP_PATH + '/vendor/etc/selinux/nonplat_file_contexts'))
         for tmp_item in new_set:
             tmp_item.selabel = get_selabel_windows(tmp_file_context, tmp_item.rela_path)
 

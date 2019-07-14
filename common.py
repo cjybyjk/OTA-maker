@@ -168,6 +168,11 @@ def read_statfile(path, def_sys_root = '/system'):
             # 最终返回的字典 以文件相对路径为key 其他信息的列表为value
     return save_dic
 
+def filter_sel(line):
+    return any([line.startswith("/system"),
+                line.startswith("/vendor"),
+                line.startswith("/(vendor|system/vendor)")])
+
 def get_file_contexts(file_path, t_root=''):
     # 解析file_contexts文件 生成属性键值字典
     check_file(file_path)
@@ -188,11 +193,11 @@ def get_file_contexts(file_path, t_root=''):
     with open(fpath, "r", encoding="UTF-8", errors="ignore") as f:
         for line in f.readlines():
             linesp = line.strip()
-            if linesp == '' or linesp.startswith('#'): continue
-            k, v = linesp.split(maxsplit=1)
-            if v.startswith("--"):
-                v = v.split(maxsplit=1)[-1].strip()
-            sel_dic[t_root + k] = v
+            if filter_sel(linesp):
+                k, v = linesp.split(maxsplit=1)
+                if v.startswith("--"):
+                    v = v.split(maxsplit=1)[-1].strip()
+                sel_dic[t_root + k] = v
     return sel_dic
 
 

@@ -264,8 +264,10 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                 elif us_action == "set_metadata_recursive":
                     tmp_updater.set_metadata_recursive(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7], tmp_line[9])
                 elif us_action == "mount":
+                    if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
                     tmp_updater.mount(tmp_line[-1])
                 elif us_action == "umount":
+                    if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
                     tmp_updater.umount(tmp_line[1])
                 elif us_action == "apply_patch_check":
                     tmp_updater.apply_patch_check(tmp_line[1], tutle(tmp_line[2:]))

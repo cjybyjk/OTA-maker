@@ -272,14 +272,14 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                 elif us_action == "apply_patch_check":
                     tmp_updater.apply_patch_check(tmp_line[1], tutle(tmp_line[2:]))
                 elif us_action == "apply_patch":
-                    tmp_updater.add("apply_patch %s:%s;" 
+                    tmp_updater.add("apply_patch %s:%s" 
                                     %(" ".join(str(s) for s in tmp_line[1:5]), tmp_line[6]))
                 elif us_action == "show_progress":
-                    tmp_updater.add("show_progress %s %s;" %(tmp_line[1], tmp_line[6]))
+                    tmp_updater.add("show_progress %s %s" %(tmp_line[1], tmp_line[6]))
                 elif us_action == "set_progress":
-                    tmp_updater.add("set_progress %s;" %tmp_line[1])
+                    tmp_updater.add("set_progress %s" %tmp_line[1])
                 elif us_action == "run_program":
-                    itmp_updater.add(" ".join(str(s) for s in tmp_line[1:]))
+                    tmp_updater.add(" ".join(str(s) for s in tmp_line[1:]))
                 else:
                     print("WARNING: failed to analyze " + line.strip())
             except:

@@ -54,32 +54,32 @@ class Updater:
         self.script.append(" " * space_no + "ui_print \"%s\";\n" % string)
 
     def mount(self, path):
-        self.script.append("mount %s;\n" % path)
+        self.script.append("mount %s\n" % path)
 
     def unmount(self, path):
-        self.script.append("umount %s;\n" % path)
+        self.script.append("umount %s\n" % path)
 
     def package_extract_file(self, s_file, d_file):
-        self.script.append("package_extract_file %s %s;\n" % (s_file, d_file))
+        self.script.append("package_extract_file %s %s\n" % (s_file, d_file))
 
     def package_extract_dir(self, s_dir, d_dir):
-        self.script.append("package_extract_dir %s %s;\n" % (s_dir, d_dir))
+        self.script.append("package_extract_dir %s %s\n" % (s_dir, d_dir))
 
     def delete(self, *files):
-        self.script.append("delete %s;\n" % " ".join(files))
+        self.script.append("delete %s\n" % " ".join(files))
 
     def delete_recursive(self, *dirs):
-        self.script.append("delete_recursive %s;\n" % " ".join(dirs))
+        self.script.append("delete_recursive %s\n" % " ".join(dirs))
 
     def symlink(self, path, *links):
-        self.script.append("symlink %s %s;\n" % (path, " ".join(links)))
+        self.script.append("symlink %s %s\n" % (path, " ".join(links)))
 
     def set_perm(self, owner, group, mode, *files):
-        self.script.append("set_perm %s %s %s %s;\n"
+        self.script.append("set_perm %s %s %s %s\n"
                            % (owner, group, mode, " ".join(files)))
 
     def set_perm_recursive(self, owner, group, dmode, fmode, *dirs):
-        self.script.append("set_perm %s %s %s %s %s;\n"
+        self.script.append("set_perm %s %s %s %s %s\n"
                            % (owner, group, dmode, fmode, " ".join(dirs)))
 
     def set_metadata(self, file, uid, gid, mode,
@@ -89,7 +89,7 @@ class Updater:
             s += " capabilities %s" % capabilities
         if selabel:
             s += " selabel %s" % selabel
-        self.script.append(s + ";\n")
+        self.script.append(s + "\n")
 
     def set_metadata_recursive(self, dir, uid, gid, dmode, fmode,
                                capabilities=None, selabel=None):
@@ -99,14 +99,14 @@ class Updater:
             s += " capabilities %s" % capabilities
         if selabel:
             s += " selabel %s" % selabel
-        self.script.append(s + ";\n")
+        self.script.append(s + "\n")
 
     def apply_patch_check(self, spath, *f_shas):
-        self.script.append("apply_patch_check %s %s;\n" % (spath, " ".join(f_shas)))
+        self.script.append("apply_patch_check %s %s\n" % (spath, " ".join(f_shas)))
 
     def apply_patch(self, spath, f_sha1, tgtsize, p_sha1, p_path):
         # applypatch <目标文件路径> <-> <打补丁后的文件哈希> \
         #            <打补丁后的文件大小> <原文件哈希:补丁文件路径>
         # 其中 - 参数暗示覆盖原文件
-        self.script.append("apply_patch %s - %s %s %s:%s;\n"
+        self.script.append("apply_patch %s - %s %s %s:%s\n"
                            % (spath, f_sha1, tgtsize, p_sha1, p_path))

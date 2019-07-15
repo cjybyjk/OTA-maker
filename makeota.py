@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.5"
+__version__ = "1.0.6"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -278,6 +278,8 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                     tmp_updater.add("show_progress %s %s;" %(tmp_line[1], tmp_line[6]))
                 elif us_action == "set_progress":
                     tmp_updater.add("set_progress %s;" %tmp_line[1])
+                elif us_action == "run_program":
+                    itmp_updater.add(" ".join(str(s) for s in tmp_line[1:]))
                 else:
                     print("WARNING: failed to analyze " + line.strip())
             except:

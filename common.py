@@ -190,10 +190,14 @@ def get_file_contexts(file_path, t_root=''):
             linesp = line.strip()
             if not linesp or linesp.startswith("#"): continue
             k, v = linesp.split(maxsplit=1)
+            if k.endswith("(/.*)?"): 
+                tmp_k = k[:-6]
+            else: 
+                tmp_k = k
             if v.startswith("--"):
                 v = v.split(maxsplit=1)[-1].strip()
-            sel_dic[re.compile(k)] = v
-            if t_root: sel_dic[re.compile(t_root + k)] = v
+            sel_dic[re.compile(tmp_k)] = v
+            if t_root: sel_dic[re.compile(t_root + tmp_k)] = v
     return sel_dic
 
 

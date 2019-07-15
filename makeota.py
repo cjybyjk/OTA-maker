@@ -165,7 +165,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
         if os.path.exists(NEW_ZIP_PATH + '/vendor/etc/selinux/nonplat_file_contexts'):
             tmp_file_context.update(get_file_contexts(NEW_ZIP_PATH + '/vendor/etc/selinux/nonplat_file_contexts'))
         tmp_keys = tmp_file_context.keys()
-        for tmp_item in new_set:
+        for tmp_item in new_set | patch_set:
             tmp_item.selabel = get_selabel_windows(tmp_file_context, tmp_keys, tmp_item.rela_path)
 
     print('Generating updater...')
@@ -214,7 +214,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
 
     # 设置metadata
     tmp_updater.ui_print('Setting metadata...')
-    new_list = list(new_set)
+    new_list = list(new_set | patch_set)
     new_list.sort(key=lambda x: x.rela_path)
     for tmp_item in new_list:
         tmp_updater.set_metadata(tmp_item.rela_path, tmp_item.uid, tmp_item.gid, tmp_item.perm, selabel=tmp_item.selabel)

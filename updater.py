@@ -41,7 +41,7 @@ class Updater:
         s += "this device is $(getprop ro.product.device).\";\n"
         self.script.append(s)
 
-    def add(self, string, end=";\n"):
+    def add(self, string, end="\n"):
         self.script.append("%s%s" % (string, end))
 
     def blank_line(self):

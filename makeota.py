@@ -275,9 +275,9 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                     tmp_updater.add("apply_patch %s:%s" 
                                     %(" ".join(str(s) for s in tmp_line[1:5]), tmp_line[6]))
                 elif us_action == "show_progress":
-                    tmp_updater.add("show_progress %s %s" %(tmp_line[1], tmp_line[6]))
+                    tmp_updater.add('show_progress "%s" "%s"' %(tmp_line[1], tmp_line[6]))
                 elif us_action == "set_progress":
-                    tmp_updater.add("set_progress %s" %tmp_line[1])
+                    tmp_updater.add('set_progress "%s"' %tmp_line[1])
                 elif us_action == "run_program":
                     tmp_updater.add(" ".join(str(s) for s in tmp_line[1:]))
                 else:

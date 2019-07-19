@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -239,51 +239,65 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     # 从原版的updater-script取得操作
     tmp_updater.add('ALLOW_ABORT = false')
     tmp_updater.ui_print('Running updater-script from source zip...')
+    list_lines = []
+    flag_EOC = True # EOC: End of command
     with open(NEW_ZIP_PATH + '/META-INF/com/google/android/updater-script', "r", encoding="UTF-8") as f:
         for line in f.readlines():
-            try:
-                tmp_line = parameter_split(line.strip())
-                us_action = tmp_line[0]
-                if us_action == "package_extract_dir":
-                    if tmp_line[1] == "system" or tmp_line[1] == "vendor": continue
-                    mkdir(os.path.dirname(OTA_ZIP_PATH + '/' + tmp_line[1]))
-                    dir2dir(NEW_ZIP_PATH + '/' + tmp_line[1], OTA_ZIP_PATH + '/' + tmp_line[1])
-                    tmp_updater.package_extract_dir(tmp_line[1], tmp_line[2])
-                elif us_action == "package_extract_file":
-                    mkdir(os.path.dirname(OTA_ZIP_PATH + '/' + tmp_line[1]))
-                    file2file(NEW_ZIP_PATH  + '/' + tmp_line[1], OTA_ZIP_PATH  + '/' + tmp_line[1])
-                    tmp_updater.package_extract_file(tmp_line[1], tmp_line[2])
-                elif us_action == "ui_print":
-                    tmp_updater.ui_print(" ".join(str(s) for s in tmp_line[1:]))
-                elif us_action == "set_perm":
-                    tmp_updater.set_perm(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4:])
-                elif us_action == "set_perm_recursive":
-                    tmp_updater.set_perm_recursive(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4], tutle(tmp_line[5:]))
-                elif us_action == "set_metadata":
-                    tmp_updater.set_metadata(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7])
-                elif us_action == "set_metadata_recursive":
-                    tmp_updater.set_metadata_recursive(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7], tmp_line[9])
-                elif us_action == "mount":
-                    if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
-                    tmp_updater.mount(tmp_line[-1])
-                elif us_action == "umount":
-                    if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
-                    tmp_updater.umount(tmp_line[1])
-                elif us_action == "apply_patch_check":
-                    tmp_updater.apply_patch_check(tmp_line[1], tutle(tmp_line[2:]))
-                elif us_action == "apply_patch":
-                    tmp_updater.add("apply_patch %s:%s" 
-                                    %(" ".join(str(s) for s in tmp_line[1:5]), tmp_line[6]))
-                elif us_action == "show_progress":
-                    tmp_updater.add('show_progress "%s" "%s"' %(tmp_line[1], tmp_line[6]))
-                elif us_action == "set_progress":
-                    tmp_updater.add('set_progress "%s"' %tmp_line[1])
-                elif us_action == "run_program":
-                    tmp_updater.add(" ".join(str(s) for s in tmp_line[1:]))
-                else:
-                    print("WARNING: failed to analyze " + line.strip())
-            except:
-                continue
+            t_line = line.strip()
+            if flag_EOC:
+                list_lines.append(t_line)
+            else:
+                list_lines[-1] = list_lines[-1] + ' ' + t_line
+            if t_line[-1] == ";":
+                flag_EOC = True
+            else:
+                flag_EOC = False
+    for line in list_lines:
+        try:
+            tmp_line = parameter_split(line)
+            us_action = tmp_line[0]
+            if us_action == "package_extract_dir":
+                if tmp_line[1] == "system" or tmp_line[1] == "vendor": continue
+                mkdir(os.path.dirname(OTA_ZIP_PATH + '/' + tmp_line[1]))
+                dir2dir(NEW_ZIP_PATH + '/' + tmp_line[1], OTA_ZIP_PATH + '/' + tmp_line[1])
+                tmp_updater.package_extract_dir(tmp_line[1], tmp_line[2])
+            elif us_action == "package_extract_file":
+                mkdir(os.path.dirname(OTA_ZIP_PATH + '/' + tmp_line[1]))
+                file2file(NEW_ZIP_PATH  + '/' + tmp_line[1], OTA_ZIP_PATH  + '/' + tmp_line[1])
+                tmp_updater.package_extract_file(tmp_line[1], tmp_line[2])
+            elif us_action == "ui_print":
+                tmp_updater.ui_print(" ".join(tmp_line[1:]))
+            elif us_action == "set_perm":
+                tmp_updater.set_perm(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4:])
+            elif us_action == "set_perm_recursive":
+                tmp_updater.set_perm_recursive(tmp_line[1], tmp_line[2], tmp_line[3], tmp_line[4], tutle(tmp_line[5:]))
+            elif us_action == "set_metadata":
+                tmp_updater.set_metadata(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7])
+            elif us_action == "set_metadata_recursive":
+                tmp_updater.set_metadata_recursive(tmp_line[1], tmp_line[3], tmp_line[5], tmp_line[7], tmp_line[9])
+            elif us_action == "mount":
+                if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
+                tmp_updater.mount(tmp_line[-1])
+            elif us_action == "umount":
+                if tmp_line[-1] == "/system" or tmp_line[-1] == "/vendor": continue
+                tmp_updater.umount(tmp_line[1])
+            elif us_action == "apply_patch_check":
+                tmp_updater.apply_patch_check(tmp_line[1], tutle(tmp_line[2:]))
+            elif us_action == "apply_patch":
+                tmp_updater.add("apply_patch %s:%s" 
+                                %(" ".join(tmp_line[1:5]), tmp_line[6]))
+            elif us_action == "show_progress":
+                tmp_updater.add('show_progress "%s" "%s"' %(tmp_line[1], tmp_line[6]))
+            elif us_action == "set_progress":
+                tmp_updater.add('set_progress "%s"' %tmp_line[1])
+            elif us_action == "run_program":
+                tmp_updater.add(" ".join(tmp_line[1:]))
+            elif us_action == "symlink":
+                tmp_updater.add('symlink ' + " ".join(tmp_line[1:]))
+            else:
+                print("WARNING: failed to analyze " + line.strip())
+        except:
+            continue
 
     tmp_updater.blank_line()
     tmp_updater.add("sync")

@@ -58,8 +58,8 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                     OLD_ZIP_PATH + '/system_root',
                     '-o', 'rw,loop')))
             os.system(" ".join(('sudo', 'mount',
-                    OLD_ZIP_PATH + '/system.img',
-                    OLD_ZIP_PATH + '/system_root',
+                    NEW_ZIP_PATH + '/system.img',
+                    NEW_ZIP_PATH + '/system_root',
                     '-o', 'rw,loop')))
         else:
             os.rename(OLD_ZIP_PATH + '/system', OLD_ZIP_PATH + '/system_root')

@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
@@ -194,7 +194,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     patch_list = list(patch_set)
     patch_list.sort(key=lambda x: x.rela_path)
     for tmp_item in patch_list:
-        tmp_updater.apply_patch_check(tmp_item.rela_path, old_sha1_dict[tmp_item.rela_path])
+        tmp_updater.apply_patch_check(tmp_item.rela_path, old_sha1_dict[tmp_item.rela_path], tmp_item.sha1)
     tmp_updater.blank_line()
     tmp_updater.ui_print('Extracting patch files...')
     tmp_updater.package_extract_dir('patch', '/tmp/patch')

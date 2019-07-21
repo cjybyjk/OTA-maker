@@ -182,7 +182,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
         build_prop_dict.get('ro.build.product'))
     tmp_updater.blank_line()
 
-    tmp_updater.ui_print('This OTA package is made by OTA-maker')
+    tmp_updater.ui_print('This OTA package is made by OTA-maker V.' + __version__)
     tmp_updater.ui_print('Mounting ' + SYSTEM_ROOT)
     tmp_updater.mount(SYSTEM_ROOT)
     if IS_TREBLE:

@@ -237,7 +237,6 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     tmp_updater.blank_line()
 
     # 从原版的updater-script取得操作
-    tmp_updater.add('ALLOW_ABORT = false')
     tmp_updater.ui_print('Running updater-script from source zip...')
     list_lines = []
     flag_EOC = True # EOC: End of command

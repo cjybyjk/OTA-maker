@@ -16,6 +16,10 @@ __version__ = "1.0.8"
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 4
 
+# 不进行 patch 的文件
+do_not_patch_set = {"build.prop", "recovery-from-boot.p", "install-recovery.sh",
+                    "backuptool.functions", "backuptool.sh"}
+
 def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     print('Unpacking %s ...' %OLD_ZIP)
     OLD_ZIP_PATH = extract_zip(OLD_ZIP)
@@ -122,7 +126,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
             if tmp_item.slink:
                 sym_set.add(tmp_item)
                 rem_set.add(tmp_item)
-            elif not os.path.exists(OLD_ZIP_PATH + tmp_item.rela_path):
+            elif not os.path.exists(OLD_ZIP_PATH + tmp_item.rela_path) or tmp_item.filename in do_not_patch_set:
                 new_file_path = OTA_ZIP_PATH + tmp_item.rela_path
                 if not os.path.isdir(NEW_ZIP_PATH + tmp_item.rela_path):
                     mkdir(os.path.split(new_file_path)[0])

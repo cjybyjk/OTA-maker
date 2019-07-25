@@ -16,7 +16,8 @@ class FileInfo:
             self.rela_path = self.path.replace(root_path, "", 1).replace("\\","/")
         else:
             self.rela_path = ""
-        
+
+        self.filename = os.path.split(path)[1]
         if not common.is_win():
             self.set_info(self.get_stat(self.path))
 

@@ -252,7 +252,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
                 list_lines.append(t_line)
             else:
                 list_lines[-1] = list_lines[-1] + ' ' + t_line
-            if t_line[-1] == ";" or t_line[1] == "#" :
+            if t_line[-1] == ";" or t_line[0] == "#" :
                 flag_EOC = True
             else:
                 flag_EOC = False

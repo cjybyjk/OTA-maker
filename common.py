@@ -204,16 +204,8 @@ def get_file_contexts(file_path, t_root=''):
 def get_selabel_linux(path):
     # 获取path的SE上下文属性
     # 仅用于Linux环境
-    if os.path.isdir(path):
-        path, name = os.path.split(path)
-        with os.popen("ls -Z %s > /dev/null" % path) as infos:
-            for s in infos.readlines():
-                info = s.strip().split()
-                if name in info:
-                    break
-    else:
-        with os.popen("ls -Z %s" % path) as infos:
-            info = infos.read().strip().split()
+    with os.popen("ls -dZ %s" % path) as infos:
+        info = infos.read().strip().split()
     if len(info) > 2:
         return info[3]
     else:

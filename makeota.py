@@ -105,8 +105,8 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
             vendor_dict = read_statfile(NEW_ZIP_PATH + '/vendor', def_sys_root='/vendor')
         else:
             vendor_dict = {}
-        old_vendor_set = get_fileinfo_set(OLD_ZIP_PATH, OLD_ZIP_PATH + '/vendor/', vendor_dict)
-        new_vendor_set = get_fileinfo_set(NEW_ZIP_PATH, NEW_ZIP_PATH + '/vendor/', vendor_dict)
+        old_vendor_set = get_fileinfo_set(OLD_ZIP_PATH, OLD_ZIP_PATH + '/vendor', vendor_dict)
+        new_vendor_set = get_fileinfo_set(NEW_ZIP_PATH, NEW_ZIP_PATH + '/vendor', vendor_dict)
         diff_set = diff_set | old_vendor_set.symmetric_difference(new_vendor_set)
 
     OTA_ZIP_PATH = tempfile.mkdtemp("", "OTA-maker_")

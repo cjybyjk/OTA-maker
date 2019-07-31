@@ -21,9 +21,10 @@ def is_win():
 def get_bin(program_name):
     return os.path.join(os.getcwd(), "bin", program_name)
 
-def check_file(file_path):
-    if not os.path.exists(file_path):
-        raise PathNotFoundError("%s: No such file or directory" %file_path)
+def check_file(*file_path):
+    for fp in file_path:
+        if not os.path.exists(fp):
+            raise PathNotFoundError("%s: No such file or directory" %fp)
 
 def mkdir(path):
     # 创建目录

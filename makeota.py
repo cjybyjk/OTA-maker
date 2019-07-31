@@ -14,13 +14,14 @@ from updater import Updater
 __version__ = "1.0.8"
 
 # 执行 bsdiff 使用的进程数
-BSDIFF_PROC_NUM = 4
+BSDIFF_PROC_NUM = 6
 
 # 不进行 patch 的文件
 do_not_patch_set = {"build.prop", "recovery-from-boot.p", "install-recovery.sh",
                     "backuptool.functions", "backuptool.sh"}
 
 def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
+    check_file(OLD_ZIP, NEW_ZIP)
     print('Unpacking %s ...' %OLD_ZIP)
     OLD_ZIP_PATH = extract_zip(OLD_ZIP)
     print('Unpacking %s ...' %NEW_ZIP)

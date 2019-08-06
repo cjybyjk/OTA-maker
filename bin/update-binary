@@ -129,6 +129,8 @@ sha1_check() {
 # apply_patch <src_file> <tgt_file> <tgt_sha1> <tgt_size> [<src_sha1_1>:<patch1> [<src_sha1_2>:<patch2> ...]]
 apply_patch() {
   LD_LIBRARY_PATH=$SYS_LD_LIBRARY_PATH applypatch "$@" || LD_LIBRARY_PATH=$SYS_LD_LIBRARY_PATH /tmp/install/applypatch "$@";
+  cache=$(echo "$1" | sed "s?/?@?g")
+  delete "/data/dalvik/arm/$cache" "/data/dalvik/arm64/$cache" 
 }
 
 # apply_patch_check <file> [<sha1_hex> [<sha1_hex2> ...]]

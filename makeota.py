@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 
 # 执行 bsdiff 使用的进程数
 BSDIFF_PROC_NUM = 6
@@ -312,9 +312,6 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     if IS_TREBLE:
         tmp_updater.ui_print('Unmounting /vendor...')
         tmp_updater.unmount("/vendor")
-    tmp_updater.blank_line()
-    tmp_updater.delete_recursive("/cache/*")
-    tmp_updater.delete_recursive("/data/dalvik-cache")
     tmp_updater.blank_line()
     tmp_updater.ui_print("Done!")
 

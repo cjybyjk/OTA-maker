@@ -13,9 +13,6 @@ from updater import Updater
 
 __version__ = "1.0.9"
 
-# 执行 bsdiff 使用的进程数
-BSDIFF_PROC_NUM = 6
-
 # 不进行 patch 的文件
 do_not_patch_set = {"build.prop", "recovery-from-boot.p", "install-recovery.sh",
                     "backuptool.functions", "backuptool.sh"}
@@ -116,7 +113,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     print('Copying files and generating patches...')
     patch_set = set(); rem_set = set(); sym_set = set(); new_set = set()
     old_sha1_dict = {}
-    tp_executor = Pool(processes=BSDIFF_PROC_NUM)
+    tp_executor = Pool()
     for tmp_item in diff_set:
         if OLD_ZIP_PATH in tmp_item.path:
             if not os.path.exists(NEW_ZIP_PATH + tmp_item.rela_path):

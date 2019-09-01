@@ -11,7 +11,7 @@ from multiprocessing import Pool
 from fileinfo import FileInfo
 from updater import Updater
 
-__version__ = "1.0.9"
+__version__ = "1.0.10"
 
 # 不进行 patch 的文件
 do_not_patch_set = {"build.prop", "recovery-from-boot.p", "install-recovery.sh",
@@ -79,11 +79,22 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
         build_prop_dict = get_build_prop(NEW_ZIP_PATH + SYSTEM_ROOT + '/build.prop')
     else:
         build_prop_dict = get_build_prop(NEW_ZIP_PATH + SYSTEM_ROOT + '/system/build.prop')
+    info_sdk_version = build_prop_dict.get("ro.build.version.sdk")
+    info_build_version_release = build_prop_dict.get('ro.build.version.release')
+    info_build_fingerprint = build_prop_dict.get('ro.build.fingerprint')
+    info_product_device = build_prop_dict.get('ro.product.device')
+    info_build_product = build_prop_dict.get('ro.build.product')
+    if info_product_device == "None":
+        info_product_device = build_prop_dict.get('ro.product.system.device')
+    if info_build_product == "None":
+        info_build_product = build_prop_dict.get('ro.system.build.product')
+    
     print('------ ROM Info -------')
-    print('Device: %s' %build_prop_dict.get('ro.product.device'))
-    print('Android Version: %s' %build_prop_dict.get('ro.build.version.release'))
-    print('API level: %s' %build_prop_dict.get('ro.build.version.sdk'))
-    print('Fingerprint: %s' %build_prop_dict.get('ro.build.fingerprint'))
+    print('Device: %s' %info_product_device)
+    print('Product: %s' %info_build_product)
+    print('Android Version: %s' %info_build_version_release)
+    print('API level: %s' %info_sdk_version)
+    print('Fingerprint: %s' %info_build_fingerprint)
     print('')
 
     # 取得文件列表并存储为集合
@@ -179,9 +190,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
     else:
         tmp_updater.add("SYS_LD_LIBRARY_PATH=/system/lib")
         file2file(get_bin('applypatch'), OTA_ZIP_PATH + '/install/applypatch')
-    tmp_updater.check_device(
-        build_prop_dict.get('ro.product.device'),
-        build_prop_dict.get('ro.build.product'))
+    tmp_updater.check_device(info_product_device, info_build_product)
     tmp_updater.blank_line()
 
     tmp_updater.ui_print('This OTA package is made by OTA-maker V.' + __version__)

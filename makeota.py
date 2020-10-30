@@ -52,6 +52,7 @@ def main(OLD_ZIP, NEW_ZIP, OUT_PATH):
         print('Found system-as-root device')
         if not is_win():
             print('Found system-as-root device, remounting system partition')
+            mkdir(OLD_ZIP_PATH + '/system_root')
             mkdir(NEW_ZIP_PATH + '/system_root')
             os.system(" ".join(('sudo', 'umount', OLD_ZIP_PATH + '/system')))
             os.system(" ".join(('sudo', 'umount', NEW_ZIP_PATH + '/system')))

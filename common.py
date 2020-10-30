@@ -73,7 +73,7 @@ def extract_brotli(file_path):
     # 解压 *.br 压缩文件
     check_file(file_path)
     extract_path = file_path[:-3]
-    if is_win:
+    if is_win():
         brotli_bin = "brotli.exe"
     else:
         brotli_bin = "brotli" 
